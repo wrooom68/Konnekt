@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "230455279903",
+    "project_id": "konnekt4march",
+    "storage_bucket": "konnekt4march.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230455279903:android:429d409dde41ab238c302a",
+        "android_client_info": {
+          "package_name": "com.gmsquare.konnekt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "230455279903-inhf3i8fh6gv91lf1v5m1idf60feteff.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gmsquare.konnekt",
+            "certificate_hash": "78a834349c9415f48e8da9c8517bc0699e1829e7"
+          }
+        },
+        {
+          "client_id": "230455279903-19ube1r3mfe4vo76t9f23euhb9rlglvv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAI8IEvnabs_kVLPALUsWlr5iCs4kWm588"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "230455279903-19ube1r3mfe4vo76t9f23euhb9rlglvv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

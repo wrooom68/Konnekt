@@ -1,10 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using Firebase;
 using Firebase.Auth;
-using Firebase.Unity.Editor;
 
 public class Loginscreen : MonoBehaviour {
 
@@ -23,7 +19,7 @@ public class Loginscreen : MonoBehaviour {
 	// Handle initialization of the necessary firebase modules:
 	void InitializeFirebase() {
 		Debug.Log("Setting up Firebase Auth");
-		firebaseAuth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+		firebaseAuth = FirebaseAuth.DefaultInstance;
 	}
 	// Use this for initialization
 	void Start () 

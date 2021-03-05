@@ -12,6 +12,9 @@ Packages/packages-lock.json
 /.vs/
 .vscode
 
+# big so files
+*.so
+
 # Ignore manually added packages
 com.*
 upm-xr*
