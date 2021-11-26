@@ -24,8 +24,7 @@ public class Mainscreen : MonoBehaviour {
 	}
 
 	public void OnProfileClick(){
-		DonotdestroyHandler.prevLvlNum =UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name;
-		UnityEngine.SceneManagement.SceneManager.LoadScene ("Userprofile");
+		AppHandler._instance.ShowScene ("Userprofile");
 	}
 
 	public void OnMalePanelClick(){
@@ -55,7 +54,6 @@ public class Mainscreen : MonoBehaviour {
 	}
 
 	public void OnCandidateClick(){
-		DonotdestroyHandler.prevLvlNum = UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name;
-		UnityEngine.SceneManagement.SceneManager.LoadScene ("Candidateprofile");
+        AppHandler._instance.ShowScene("Candidateprofile");
 	}
 }

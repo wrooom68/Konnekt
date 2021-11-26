@@ -1,161 +1,153 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using Firebase.Auth;
+using Firebase;
 
 public class Loginscreen : MonoBehaviour {
 
-	public GameObject recieveOTPpanel;
+    [SerializeField] private GameObject OTPpanel;
 
-	public InputField forMobileNumber;
-	public InputField forOTPrecieve;
+    [SerializeField] private GameObject recieveOTPpanel;
 
-	public bool yesAuthenticated = false;
+    [SerializeField] private GameObject setPINpanel;
 
+    [SerializeField] private GameObject checkPINpanel;
 
-	FirebaseAuth firebaseAuth;
+    [SerializeField] private InputField forMobileNumber;
+    [SerializeField] private InputField forOTPrecieve;
+
+    [SerializeField] private InputField forPIN;
+    [SerializeField] private InputField forConfirmPIN;
+
+    [SerializeField] private InputField forCheckPIN;
+
+    FirebaseApp app;
+    FirebaseAuth firebaseAuth;
 	FirebaseUser user;
 	PhoneAuthProvider provider;
 
-	// Handle initialization of the necessary firebase modules:
-	void InitializeFirebase() {
-		Debug.Log("Setting up Firebase Auth");
-		firebaseAuth = FirebaseAuth.DefaultInstance;
-	}
 	// Use this for initialization
 	void Start () 
 	{
-		recieveOTPpanel.SetActive (false);
-		InitializeFirebase ();
-	}
-	
-	// Update is called once per frame
-	void Update () {
+        OTPpanel.SetActive(false);
+        recieveOTPpanel.SetActive(false);
+        checkPINpanel.SetActive(false);
+        setPINpanel.SetActive(false);
+    }
+
+    private void OnEnable()
+    {
+        AppHandler._instance._OTPautoVerifyFail += AutoVerifyOTPfail;
+        AppHandler._instance._OTPscreen += ShowRegisterPage;
+        AppHandler._instance._PINset += ShowPINPage;
+        AppHandler._instance._PINcheck += ShowConfirmPINPage;
+    }
+
+    private void OnDisable()
+    {
+        AppHandler._instance._OTPautoVerifyFail -= AutoVerifyOTPfail;
+        AppHandler._instance._OTPscreen -= ShowRegisterPage;
+        AppHandler._instance._PINset -= ShowPINPage;
+        AppHandler._instance._PINcheck -= ShowConfirmPINPage;
+    }
+    // Update is called once per frame
+    void Update ()
+    {
 		if (Input.GetKeyDown (KeyCode.Escape) && recieveOTPpanel.activeSelf) 
 		{
 			recieveOTPpanel.SetActive (false);
 		}
-		
 	}
 
-	public void OnSubmitOTPclick(){
-		DonotdestroyHandler.prevLvlNum = UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name;
-		Credential credential =
-			provider.GetCredential(PlayerPrefs.GetString("verifyid"), forOTPrecieve.text);
+    public void CheckAndSavePin()
+    {
+        if (forConfirmPIN.text.Equals(forPIN.text))
+        {
+            Debug.Log("Check 1");
 
-		if (credential != null) {
-			firebaseAuth.SignInWithCredentialAsync(credential).ContinueWith(task => {
-				if (task.IsFaulted) {
-					Debug.LogError("SignInWithCredentialAsync encountered an error: " +
-						task.Exception);
-					return;
-				}
+            AppHandler._instance._myData.UserPin = forPIN.text;
+            Debug.Log("Check 2");
+            ShowConfirmPINPage();
+        }
+    }
 
-				FirebaseUser newUser = task.Result;
-				Debug.Log("User signed in successfully");
-				// This should display the phone number.
-				Debug.Log("Phone number: " + newUser.PhoneNumber);
-				// The phone number providerID is 'phone'.
-				Debug.Log("Phone provider ID: " + newUser.ProviderId);
-				if (yesAuthenticated) {
-					UnityEngine.SceneManagement.SceneManager.LoadScene ("Main");
-				} else {
-					if (PlayerPrefs.GetInt ("userformcomplete",0) == 0) {
-						UnityEngine.SceneManagement.SceneManager.LoadScene ("Newuserform");
-					} else {
-						UnityEngine.SceneManagement.SceneManager.LoadScene ("WaitingLounge");
-					}
-				}
-			});
+    public void ConfirmPINcheckSuccess()
+    {
+        if (forCheckPIN.text.Equals(AppHandler._instance._myData.UserPin))
+        {
+            if (AppHandler._instance._myData._isVerified)
+            {
+                AppHandler._instance.ShowScene("Main");
+            }
+            else
+            {
+                if (AppHandler._instance._myData.UserName.Trim().Equals(""))
+                {
+                    AppHandler._instance.ShowScene("Newuserform");
+                }
+                else
+                {
+                    AppHandler._instance.ShowScene("WaitingLounge");
+                }
+            }
+        }
+    }
 
+    void ShowRegisterPage()
+    {
+        OTPpanel.SetActive(true);
+        recieveOTPpanel.SetActive(false);
+        checkPINpanel.SetActive(false);
+        setPINpanel.SetActive(false);
+    }
 
-		}
-		
+    void ShowPINPage()
+    {
+        OTPpanel.SetActive(false);
+        recieveOTPpanel.SetActive(false);
+        checkPINpanel.SetActive(false);
+        setPINpanel.SetActive(true);
+    }
+
+    void ShowConfirmPINPage()
+    {
+        Debug.Log("Check 3");
+
+        OTPpanel.SetActive(false);
+        recieveOTPpanel.SetActive(false);
+        checkPINpanel.SetActive(true);
+        Debug.Log("Check 4");
+        setPINpanel.SetActive(false);
+
+        Debug.Log("Check 5");
+    }
+
+	public void OnSubmitOTPclick()
+    {
+        AppHandler._instance.SignInWithPhoneOTP(forOTPrecieve.text);
 	}
 
-	public void OnGetOTPclick(){
-		
-		string phoneNumber ="+91"+ forMobileNumber.text;
-		uint phoneAuthTimeoutMs = 120000;
-		provider = PhoneAuthProvider.GetInstance(firebaseAuth);
-		Debug.Log (phoneNumber + ".....Phone number");
-		provider.VerifyPhoneNumber(phoneNumber, phoneAuthTimeoutMs, null,
-			verificationCompleted: (credential) => {
-				// Auto-sms-retrieval or instant validation has succeeded (Android only).
-				// There is no need to input the verification code.
-				// `credential` can be used instead of calling GetCredential().
-				Debug.Log (".....auto verify");
-				if (yesAuthenticated) {
-					UnityEngine.SceneManagement.SceneManager.LoadScene ("Main");
-				} else {
-					if (PlayerPrefs.GetInt ("userformcomplete",0) == 0) {
-						UnityEngine.SceneManagement.SceneManager.LoadScene ("Newuserform");
-					} else {
-						UnityEngine.SceneManagement.SceneManager.LoadScene ("WaitingLounge");
-					}
-				}
-			},
-			verificationFailed: (error) => {
-				// The verification code was not sent.
-				// `error` contains a human readable explanation of the problem.
-				Debug.Log (".....failed because ..." + error);
-			},
-			codeSent: (id, token) => {
-				// Verification code was successfully sent via SMS.
-				// `id` contains the verification id that will need to passed in with
-				// the code from the user when calling GetCredential().
-				// `token` can be used if the user requests the code be sent again, to
-				// tie the two requests together.
-				Debug.Log("inside codesent");
-				PlayerPrefs.SetString("verifyid",id);
-//				PlayerPrefs.SetString("verifytoken",token);
-				recieveOTPpanel.SetActive (true);
-			},
-			codeAutoRetrievalTimeOut: (id) => {
-				// Called when the auto-sms-retrieval has timed out, based on the given
-				// timeout parameter.
-				// `id` contains the verification id of the request that timed out.
-				Debug.Log("inside timeout");
-			});
-
-		Debug.Log ("Out of town");
+	public void OnGetOTPclick()
+    {
+        AppHandler._instance.SignInGetPhoneOTP(forMobileNumber.text);
 	}
 
-	public void OnFBloginclick(){
-		DonotdestroyHandler.prevLvlNum = UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name;
+    void AutoVerifyOTPfail()
+    {
+        OTPpanel.SetActive(false);
+        recieveOTPpanel.SetActive(true);
+        checkPINpanel.SetActive(false);
+        setPINpanel.SetActive(false);
+    }
 
-//		string accessToken;
-//		Firebase.Auth.Credential credential =
-//			Firebase.Auth.FacebookAuthProvider.GetCredential(accessToken);
-//		firebaseAuth.SignInWithCredentialAsync(credential).ContinueWith(task => {
-//			if (task.IsCanceled) {
-//				Debug.LogError("SignInWithCredentialAsync was canceled.");
-//				return;
-//			}
-//			if (task.IsFaulted) {
-//				Debug.LogError("SignInWithCredentialAsync encountered an error: " + task.Exception);
-//				return;
-//			}
-//
-//			Firebase.Auth.FirebaseUser newUser = task.Result;
-//			Debug.LogFormat("User signed in successfully: {0} ({1})",
-//				newUser.DisplayName, newUser.UserId);
-//		});
-
-
-		if (yesAuthenticated) {
-			UnityEngine.SceneManagement.SceneManager.LoadScene ("Main");
-		} else {
-			if (PlayerPrefs.GetInt ("userformcomplete",0) == 0) {
-				UnityEngine.SceneManagement.SceneManager.LoadScene ("Newuserform");
-			} else {
-				UnityEngine.SceneManagement.SceneManager.LoadScene ("WaitingLounge");
-			}
-		}
+    public void OnNewUserClick()
+    {
+        AppHandler._instance.ShowScene("Newuserform");
 	}
 
-	public void OnNewUserClick(){
-		DonotdestroyHandler.prevLvlNum = UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name;
-		UnityEngine.SceneManagement.SceneManager.LoadScene ("Newuserform");
-	}
+    public void OnEditorLoginClick()
+    {
+        AppHandler._instance.LoginInEditor();
+    }
 }
 

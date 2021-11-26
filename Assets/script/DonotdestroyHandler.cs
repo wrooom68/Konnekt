@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class DonotdestroyHandler : MonoBehaviour {
 
-	public static string prevLvlNum;
+	public static string prevScene;
 	public GameObject backBtnCanvas;
 
 	void Awake(){
 		DontDestroyOnLoad (this.gameObject);
-		DontDestroyOnLoad (backBtnCanvas);
 	}
 
 	// Use this for initialization
@@ -32,7 +31,7 @@ public class DonotdestroyHandler : MonoBehaviour {
 			Debug.Log ("Application Quits !!!");
 			Application.Quit ();
 		} else {
-			UnityEngine.SceneManagement.SceneManager.LoadScene (prevLvlNum);
+			AppHandler._instance.ShowScene(prevScene);
 		}
 	}
 
